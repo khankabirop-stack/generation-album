@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#56796A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Generations">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Generation Album</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#17211d; --muted:#6B7A72; --forest:#2F5D50; --forest-d:#244a40; --moss:#E3EDE6;
+  --clay:#C8643C; --sand:#EEF2EC; --line:#C9D6CD; --card:#fff; --danger:#B3402A;
+  --son:#3E6FA0; --daughter:#B5527A;
+  --sage1:#8BA37E; --sage2:#6F9078; --sage3:#56796A;
+  --on-bg:#fff; --on-bg-soft:rgba(255,255,255,.82);
+  --shadow:0 4px 0 rgba(23,33,29,.22),0 14px 28px rgba(14,30,24,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;
+  background:var(--sage2) radial-gradient(120% 90% at 30% 12%,var(--sage1) 0%,var(--sage2) 55%,var(--sage3) 100%) fixed}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;margin:0;font-weight:700;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+
+/* ---------- buttons / inputs ---------- */
+.btn{border:2px solid var(--ink);border-radius:9px;padding:8px 14px;font-weight:700;font-size:12px;background:var(--forest);color:#fff;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-shadow:0 3px 0 rgba(23,33,29,.85)}
+.btn:hover{background:var(--forest-d)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(23,33,29,.85)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.ghost:hover{background:var(--sand)}
+.btn.danger{background:#fff;color:var(--danger);border-color:var(--danger);box-shadow:0 3px 0 rgba(179,64,42,.5)}
+.btn.danger:hover{background:#FBEAE5}
+.btn.sm{padding:5px 10px;font-size:11px;border-radius:7px}
+.btn.block{width:100%}
+.field{display:block;margin-bottom:14px}
+.field>span,.lbl{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.input{width:100%;border:2px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;font-size:12.5px;outline:none;transition:.15s}
+.input:focus{border-color:var(--forest);box-shadow:0 0 0 3px rgba(47,93,80,.18)}
+textarea.input{resize:vertical;min-height:80px}
+.err{background:#FBEAE5;color:var(--danger);border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:14px;display:none}
+.err.show{display:block}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+.spin.dark{border-color:rgba(0,0,0,.15);border-top-color:var(--forest)}
+.loading .spin.dark{border-color:rgba(255,255,255,.35);border-top-color:#fff}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---------- brand / auth ---------- */
+.brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:700;font-size:15.5px;color:var(--on-bg);text-decoration:none}
+.logo{width:30px;height:30px;border-radius:9px;background:#fff;color:var(--forest-d);border:2px solid var(--ink);display:grid;place-items:center;flex:none}
+.logo svg{width:17px;height:17px}
+.auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.auth-box{width:100%;max-width:410px}
+.auth-box .brand{justify-content:center;margin-bottom:6px;font-size:20px}
+.auth-box .tag{text-align:center;color:var(--on-bg-soft);margin:0 0 18px;font-size:12px}
+.panel{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:24px;border:2.5px solid var(--ink)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--sand);border-radius:10px;padding:4px;margin-bottom:20px;border:2px solid var(--line)}
+.tabs button{border:0;background:transparent;padding:9px;border-radius:7px;font-weight:700;color:var(--muted)}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.tabs.three{grid-template-columns:1fr 1fr 1fr}
+.tabs.three button{font-size:13px;padding:9px 4px}
+.gbar.one{grid-template-columns:1fr}
+.pwrow{position:relative}
+.pwrow .eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);font-size:11.5px;font-weight:700;padding:6px}
+.demo{margin-top:16px;font-size:11px;color:var(--muted);text-align:center;background:#FFF3DA;border-radius:8px;padding:8px 10px}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:30;background:rgba(40,66,55,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.22)}
+.top-in{max-width:1000px;margin:0 auto;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.userchip{display:flex;align-items:center;gap:8px;border:2px solid var(--ink);background:#fff;border-radius:999px;padding:2px 10px 2px 2px;font-weight:700;font-size:11px}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--forest);color:#fff;display:grid;place-items:center;font-size:10.5px}
+
+/* ---------- role position spinner ---------- */
+.details select.possel{font:inherit;font-weight:700;font-size:inherit;color:var(--son);background:#fff;border:2px solid var(--ink);border-radius:8px;padding:2px 6px;margin-left:4px;max-width:80px}
+.details select.possel.role-daughter{color:var(--daughter)}
+.details .rolewrap{display:inline-flex;align-items:center}
+/* ---------- side menu ---------- */
+.menuov{position:fixed;inset:0;z-index:70;background:rgba(14,26,21,.55);animation:fade .15s}
+.menu{position:absolute;top:0;right:0;bottom:0;width:min(86vw,340px);background:#fff;border-left:2.5px solid var(--ink);display:flex;flex-direction:column;animation:slidein .2s}
+@keyframes slidein{from{transform:translateX(100%)}to{transform:none}}
+.menu-h{padding:calc(14px + env(safe-area-inset-top)) 16px 14px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+.menu-h .who{flex:1;min-width:0}
+.menu-h .who b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-h .who small{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.menu-h .avatar{width:38px;height:38px;font-size:12.5px}
+.menu-b{flex:1;overflow-y:auto;padding:10px 12px}
+.menu-t{font-size:11px;font-weight:700;color:var(--muted);margin:10px 4px 6px;text-transform:uppercase;letter-spacing:.04em}
+.menu-i{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;border:0;background:transparent;border-radius:9px;padding:10px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.menu-i:hover,.menu-i:active{background:var(--sand)}
+.menu-i.gi{flex-direction:row;align-items:center;gap:10px;padding:8px 10px}
+.menu-i.gi .mpair{display:flex;flex:none;padding-left:6px}
+.menu-i.gi .mini{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--moss);display:grid;place-items:center;overflow:hidden;margin-left:-8px;font-weight:700;color:var(--forest);font-size:11.5px}
+.menu-i.gi .mini img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;display:block}
+.menu-i.gi .mtxt{min-width:0;display:flex;flex-direction:column;gap:2px}
+.menu-i.gi .mtxt b{font-size:12.5px;line-height:1.25}
+.menu-i.gi .mtxt small{white-space:normal;line-height:1.35}
+.menu-i small{font-weight:600;color:var(--muted);font-size:10.5px}
+.menu-f{padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:2px solid var(--line);display:grid;gap:8px}
+.iconbtn{width:34px;height:34px;border-radius:8px;border:2px solid var(--ink);background:#fff;display:grid;place-items:center;font-size:15.5px;padding:0;text-decoration:none;color:var(--ink);box-shadow:0 2px 0 rgba(23,33,29,.7)}
+.iconbtn:hover{background:var(--sand)}
+.iconbtn:active{transform:translateY(2px);box-shadow:none}
+.chip{font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--moss);color:var(--forest);white-space:nowrap;border:0}
+.chip.warn{background:#FBEAE5;color:var(--danger)}
+.chip.busy{background:#FFF3DA;color:#8A6400}
+.banner{background:#FFF3DA;color:#6B4E00;text-align:center;font-size:11.5px;padding:7px 12px}
+
+/* ---------- home (list of generations) ---------- */
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 80px}
+.hello{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;color:var(--on-bg)}
+.hello h2{font-size:20px}
+.hello p{font-size:11.5px;margin:3px 0 0;color:var(--on-bg-soft)}
+.hello .btn{background:#fff;color:var(--ink)}
+.hello .btn:hover{background:var(--sand)}
+.findbar{display:flex;gap:8px;margin-bottom:22px}
+.findbar .input{letter-spacing:.08em;font-weight:700;border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.gcard{background:#fff;border:2.5px solid var(--ink);border-radius:14px;box-shadow:var(--shadow);padding:14px 10px 16px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;text-align:center}
+.gcard:hover{transform:translateY(-2px)}
+.gcard .pair{display:flex;align-items:center;padding-left:6px}
+.gcard .pair .mini{width:40px;height:40px;border-radius:50%;border:2.5px solid var(--ink);background:var(--moss);display:grid;place-items:center;overflow:hidden;margin-left:-8px;font-weight:700;color:var(--forest);font-size:13.5px}
+.gcard .pair .mini img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;display:block}
+.gcard .gid{font-weight:700;letter-spacing:.08em;font-size:10.5px;color:var(--forest);background:var(--moss);border-radius:999px;padding:3px 10px;align-self:center}
+.gcard .gid.pend{background:#FFF3DA;color:#8A6400;letter-spacing:0}
+.gcard h3{font-size:12.5px;line-height:1.25;width:100%;text-wrap:balance}
+.gcard .meta{color:var(--muted);font-size:11px}
+.gcard .toprow{display:flex;align-items:center;justify-content:center;gap:8px}
+.gcard .pair{flex:none}
+.gacts{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.gbtn{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:4px 10px 4px 8px;font:700 11px 'DM Sans',sans-serif;color:var(--ink);display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 0 rgba(23,33,29,.7)}
+.gbtn svg{width:14px;height:14px}
+.gbtn.pub{background:var(--moss);color:var(--forest)}
+.gbtn:active{transform:translateY(2px);box-shadow:none}
+.gbtn.dl{color:var(--danger);border-color:var(--danger);box-shadow:0 2px 0 rgba(179,64,42,.5)}
+.gbtn.dl:hover{background:#FBEAE5}
+.empty{text-align:center;color:var(--on-bg-soft);padding:34px 10px}
+.empty h3{color:#fff!important}
+.loading{display:grid;place-items:center;padding:80px 0}
+
+/* ---------- generation view ---------- */
+.gtop{text-align:center;padding:14px 16px 0}
+.gid-btn{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:5px 7px 5px 12px;font:700 11px 'DM Sans',sans-serif;letter-spacing:.1em;color:var(--ink);display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 0 rgba(23,33,29,.7)}
+.gid-btn .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.gid-btn .cp{width:26px;height:26px;border-radius:50%;background:var(--moss);color:var(--forest);display:grid;place-items:center}
+.gid-btn .cp svg{width:14px;height:14px}
+.gid-btn:active{transform:translateY(2px);box-shadow:none}
+.gidrow{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+.vnote{color:var(--on-bg-soft);font-size:11px;margin:8px auto 0;max-width:320px;line-height:1.35}
+.gid-btn.static{cursor:default}
+.gid-pend{display:inline-block;max-width:320px;background:rgba(255,255,255,.2);color:#fff;border:1.5px dashed rgba(255,255,255,.7);border-radius:10px;padding:8px 14px;font-size:11.5px;line-height:1.35}
+.couple{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:480px;margin:18px auto 0;padding:0 16px 90px;position:relative;align-items:start}
+.colm{min-width:0;display:flex;flex-direction:column;align-items:stretch}
+.addbtn{margin:12px auto 0;border:2px dashed;background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:6px;position:relative;z-index:2}
+.addbtn.son{color:var(--son);border-color:var(--son)}
+.addbtn.daughter{color:var(--daughter);border-color:var(--daughter)}
+.addbtn:hover{background:var(--sand)}
+.addbtn:active{transform:scale(.97)}
+.stack{position:relative;display:flex;flex-direction:column;gap:16px;padding-top:14px}
+.stack::before{content:'';position:absolute;left:50%;top:0;bottom:20px;width:3px;margin-left:-1.5px;background:rgba(255,255,255,.6);border-radius:2px}
+.trunk{width:3px;height:12px;background:rgba(255,255,255,.6);margin:0 auto}
+
+/* ---------- person card: image + name + Go ---------- */
+.photo{position:relative;aspect-ratio:4/5;background:var(--moss);display:grid;place-items:center;overflow:hidden}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.photo svg{width:44%;opacity:.5}
+.photo .plus{position:absolute;right:8px;bottom:8px;width:28px;height:28px;border-radius:50%;background:var(--forest);color:#fff;border:2px solid #fff;display:grid;place-items:center;font-size:16px;line-height:1;font-weight:700}
+.card{position:relative;z-index:1;background:#fff;border:2px solid var(--ink);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.cmain{display:block;width:100%;border:0;background:none;padding:0;text-align:left}
+.cmain:active .photo{filter:brightness(.96)}
+.pname{padding:7px 6px 8px;border-top:2px solid var(--ink);text-align:center;font-weight:700;font-size:12.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff}
+.pname .nth{font-weight:600;font-size:10px;color:var(--muted)}
+.pname.ph{color:#98A39C;font-weight:600;font-size:11.5px}
+.chead{position:relative;display:flex;align-items:center;justify-content:space-between;gap:6px;height:34px;padding:0 7px;background:#fff;border-bottom:2px solid var(--ink)}
+.chead .uid{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font-weight:700;font-size:11.5px;letter-spacing:.02em;white-space:nowrap}
+.chead .gobtn:last-child,.chead .gap:last-child{margin-left:auto}
+.chead .gap{width:24px;height:24px;flex:none}
+.gobtn{position:relative;width:24px;height:24px;flex:none;border-radius:5px;border:1.5px solid var(--forest);background:var(--forest);color:#fff;display:grid;place-items:center;padding:0;transition:.12s}
+.gobtn::after{content:'';position:absolute;inset:-9px}
+.gobtn svg{width:13px;height:13px}
+.gobtn:hover{background:var(--moss);color:var(--forest)}
+.gobtn:active{transform:scale(.92);background:var(--moss);color:var(--forest)}
+.photo{aspect-ratio:14/15}
+.cmain.ro{cursor:default}
+
+/* ---------- guest landing / public view ---------- */
+.landing{max-width:520px;margin:0 auto;padding:46px 16px 80px;color:var(--on-bg);text-align:center}
+.landing .logo.big{width:64px;height:64px;border-radius:14px;margin:0 auto 18px}
+.landing .logo.big svg{width:34px;height:34px}
+.landing h1{font-size:27px;line-height:1.15;margin-bottom:8px}
+.landing p.sub{margin:0 auto 22px;max-width:380px;color:var(--on-bg-soft);font-size:13px;line-height:1.45}
+.landing .findbar{margin-bottom:10px}
+.landing .hint{font-size:11px;color:var(--on-bg-soft);margin:0 0 34px}
+.landing .cta{background:rgba(255,255,255,.14);border:1.5px dashed rgba(255,255,255,.55);border-radius:14px;padding:16px}
+.landing .cta p{margin:0 0 12px;font-size:12px;color:var(--on-bg-soft)}
+.landing .cta .row{justify-content:center}
+.landing .cta .row>*{flex:0 1 auto}
+.landing .cta .btn.ghost{background:#fff}
+.gbar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;width:100%}
+.gbar .gbtn{flex-direction:column;justify-content:center;gap:3px;padding:6px 2px;min-width:0;border-radius:8px;font-size:10px;line-height:1.1;white-space:nowrap}
+.gbar .gbtn svg{width:15px;height:15px}
+.sec-t{color:var(--on-bg);font-weight:700;font-size:13px;margin:24px 2px 10px;opacity:.95}
+.alertbox{background:#FBEAE5;border:2px solid var(--danger);color:var(--danger);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.45;margin:0 0 12px}
+.alertbox b{display:block;font-size:12.5px;margin-bottom:4px}
+.alertbox ul{margin:6px 0;padding-left:18px}
+.alertbox small{opacity:.8}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:12px;font-weight:600;margin:0 0 12px;color:var(--ink);line-height:1.4}
+.chk input{margin-top:2px;flex:none}
+.sharedchip{max-width:170px;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+.shrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-top:1.5px solid var(--sand);font-size:12.5px;font-weight:700}
+.shrow small{display:block;color:var(--muted);font-weight:600;font-size:10.5px}
+.shrow>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.shrow{flex-wrap:wrap}
+.shrow .acts{display:flex;gap:6px;flex:none}
+.mchip{display:inline-block;margin-top:3px;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--moss);color:var(--forest)}
+.mchip.adm{background:#FFE9C7;color:#8A5200}
+.modebox{margin:0 0 12px;padding:10px 12px 2px;border:2px solid var(--line);border-radius:10px;background:var(--sand)}
+.modebox .chk small{display:block;font-weight:600;color:var(--muted);font-size:10.5px;margin-top:1px}
+
+.linkbtn{border:0;background:none;color:var(--forest);font-weight:700;font-size:11.5px;padding:0;text-decoration:underline}
+.forgot{text-align:right;margin:-8px 0 14px}
+.okmsg{background:#E3EDE6;color:var(--forest-d);border-radius:8px;padding:9px 11px;font-size:12.5px;line-height:1.4;margin-bottom:14px;display:none}
+.okmsg.show{display:block}
+.pubmsg{max-width:380px;margin:60px auto;text-align:center;color:var(--on-bg);padding:0 16px}
+.pubmsg p{color:var(--on-bg-soft);font-size:12.5px;line-height:1.45}
+
+.photo .hidtag{position:absolute;left:6px;bottom:6px;background:rgba(23,33,29,.78);color:#fff;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px}
+.photo.hid img{opacity:.38;filter:grayscale(1)}
+.hidechk{background:var(--sand);border:2px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 14px}
+.hidechk small{display:block;font-weight:600;color:var(--muted);font-size:10.5px;margin-top:2px}
+
+.how{margin:0 0 12px;padding-left:20px;font-size:12.5px;line-height:1.7;color:var(--ink)}
+.how b{font-weight:700}
+
+/* ---------- modal ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(14,26,21,.55);display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:#fff;width:100%;max-width:400px;border-radius:16px 16px 0 0;padding:18px;max-height:92vh;overflow-y:auto;animation:up .2s;border:2.5px solid var(--ink);border-bottom:0}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+@media(min-width:560px){.scrim{align-items:center;padding:20px}.sheet{border-radius:16px;border-bottom:2.5px solid var(--ink)}}
+.sheet h3{font-size:16px;margin-bottom:12px}
+.row{display:flex;gap:10px;margin-top:6px}
+.row>*{flex:1}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{border:2px solid var(--line);background:#fff;border-radius:8px;padding:8px;font-weight:700;font-size:11.5px}
+.seg button.on{background:var(--moss);border-color:var(--forest);color:var(--forest)}
+.pm-photo{width:110px;margin:0 auto 18px;text-align:center}
+.pm-photo .photo{border-radius:14px;cursor:pointer;border:2.5px solid var(--ink);aspect-ratio:1/1}
+.pm-photo small{display:block;margin-top:8px;color:var(--forest);font-weight:700;font-size:11.5px;cursor:pointer}
+.busyov{position:absolute;inset:0;background:rgba(255,255,255,.7);display:grid;place-items:center;z-index:2}
+.step{display:flex;align-items:center;gap:8px}
+.step button{width:34px;height:34px;border-radius:8px;border:2px solid var(--ink);background:#fff;font-weight:700;font-size:16px;line-height:1;padding:0}
+.step button:disabled{opacity:.35}
+.step output{min-width:64px;text-align:center;font-weight:700;font-size:12.5px}
+.note{font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.4}
+.details{display:grid;gap:0;border:2px solid var(--line);border-radius:10px;margin:0 0 16px;overflow:hidden}
+.details>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 12px;font-size:11.5px}
+.details>div+div{border-top:1.5px solid var(--sand)}
+.details span{color:var(--muted);font-weight:600}
+.details b{font-weight:700;letter-spacing:.06em}
+.details b.role-father,.details b.role-son{color:var(--son)}
+.details b.role-mother,.details b.role-daughter{color:var(--daughter)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#fff;padding:11px 18px;border-radius:9px;font-weight:600;font-size:11.5px;z-index:90;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.navbusy{position:fixed;inset:0;z-index:80;background:rgba(14,26,21,.35);display:none;place-items:center}
+.navbusy.show{display:grid}
+.navbusy .spin{width:34px;height:34px;border-width:4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modalRoot"></div>
+<div id="toast" class="toast"></div>
+<div id="navBusy" class="navbusy"><span class="spin"></span></div>
+
+<script>
+/* =====================================================================
+   CONFIG - paste your Google Apps Script Web App URL here (see Code.gs).
+   Leave empty to try the app in DEMO MODE (data stays in this browser).
+   ===================================================================== */
+const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxtJ5MDaFpDt_5Jb3Mlki1LFo6ERSW1ghBTuK7_1WVgygUgydaHreGkk0vl9JlftGxL/exec' };
+
+/* ---------------------------- helpers ---------------------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-3);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const initials = n => (n || '').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+const fmtGid = id => id ? id.slice(0, 4) + ' ' + id.slice(4) : '';
+/* a hidden photo is shown to nobody */
+const pic = p => (p && !p.hide && p.photo) ? p.photo : '';
+
+const ICON_TREE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.4"/><circle cx="5.5" cy="19" r="2.4"/><circle cx="18.5" cy="19" r="2.4"/><path d="M12 7.4v4.2M12 11.6H5.5v5M12 11.6h6.5v5"/></svg>`;
+const ICON_USER = `<svg viewBox="0 0 24 24" fill="#2F5D50"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 21c0-4.6 3.8-7.6 8.5-7.6s8.5 3 8.5 7.6z"/></svg>`;
+const brand = `<a class="brand" href="#/"><span class="logo">${ICON_TREE}</span>Generation Album</a>`;
+
+let toastT;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
+}
+function modal(html) {
+  const r = $('#modalRoot');
+  r.innerHTML = `<div class="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
+  r.firstChild.addEventListener('mousedown', e => { if (e.target.classList.contains('scrim')) closeModal(); });
+  return r.firstChild.firstChild;
+}
+const closeModal = () => { $('#modalRoot').innerHTML = ''; };
+const setView = html => { $('#app').innerHTML = html; };
+const topbar = inner => `<header class="top"><div class="top-in">${inner}</div></header>`;
+
+/* ---------------------------- backends ---------------------------- */
+const Cloud = {
+  async call(action, p) {
+    let res;
+    try {
+      res = await fetch(CONFIG.API_URL, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify({action, ...p}), redirect: 'follow'});
+    } catch (e) { throw new Error('Network error. Check your internet and try again.'); }
+    let d;
+    try { d = await res.json(); } catch (e) { throw new Error('Server returned an unexpected response.'); }
+    if (d.status !== 'success') throw new Error(d.message || 'Something went wrong.');
+    return d;
+  }
+};
+
+/* DEMO mode: same API, stored in this browser only */
+const LS = {
+  get() { try { return JSON.parse(localStorage.getItem('ga_demo3')) || {users: [], sessions: {}, rows: {}}; } catch (e) { return {users: [], sessions: {}, rows: {}}; } },
+  set(d) { try { localStorage.setItem('ga_demo3', JSON.stringify(d)); } catch (e) { throw new Error('Browser storage is full.'); } }
+};
+async function sha(s) {
+  if (window.crypto && crypto.subtle) {
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+  return btoa(unescape(encodeURIComponent(s)));
+}
+const Local = {
+  async call(action, p) {
+    const d = LS.get(); const h = Local.h[action];
+    if (!h) throw new Error('Unknown action');
+    const out = await h(d, p); LS.set(d); return {status: 'success', ...out};
+  },
+  user(d, p) {
+    const u = d.users.find(x => x.id === d.sessions[p.token]);
+    if (!u) throw new Error('Session expired. Please log in again.');
+    return u;
+  },
+  h: {
+    async register(d, p) {
+      const name = String(p.name || '').trim(), email = String(p.email || '').trim().toLowerCase(), pw = String(p.password || '');
+      if (!name) throw new Error('Please enter your name.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Please enter a valid email.');
+      if (pw.length < 6) throw new Error('Password must be at least 6 characters.');
+      if (d.users.some(u => u.email === email)) throw new Error('This email is already registered. Please log in.');
+      const salt = rid(); const u = {id: 'u_' + rid(), name, email, salt, hash: await sha(salt + pw)};
+      d.users.push(u); const token = rid() + rid(); d.sessions[token] = u.id;
+      return {token, user: {id: u.id, name, email}};
+    },
+    async login(d, p) {
+      const email = String(p.email || '').trim().toLowerCase();
+      const u = d.users.find(x => x.email === email);
+      if (!u || u.hash !== await sha(u.salt + String(p.password || ''))) throw new Error('Wrong email or password.');
+      const token = rid() + rid(); d.sessions[token] = u.id;
+      return {token, user: {id: u.id, name: u.name, email: u.email}};
+    },
+    async me(d, p) { const u = Local.user(d, p); return {user: {id: u.id, name: u.name, email: u.email}}; },
+    async logout(d, p) { delete d.sessions[p.token]; return {}; },
+    async forgotPassword() { throw new Error('Forgot password needs the live Apps Script (e-mail cannot be sent in demo mode).'); },
+    async updateProfile(d, p) {
+      const u = Local.user(d, p); const name = String(p.name || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+      if (!name) throw new Error('Please enter your name.');
+      if (p.newPassword) {
+        if (u.hash !== await sha(u.salt + String(p.oldPassword || ''))) throw new Error('Current password is wrong.');
+        if (String(p.newPassword).length < 6) throw new Error('New password must be at least 6 characters.');
+        u.hash = await sha(u.salt + String(p.newPassword));
+      }
+      u.name = name; return {user: {id: u.id, name, email: u.email}};
+    },
+    /* demo mode: everything is "full" (no lazy loading needed for local data) */
+    async loadIndex(d, p) { const u = Local.user(d, p); return {rows: (d.rows[u.email] || []).map(r => ({full: true, row: r}))}; },
+    async getGen(d, p) {
+      const u = Local.user(d, p); const r = (d.rows[u.email] || []).find(x => x.gid === p.gid);
+      if (!r) throw new Error('Generation not found.'); return {row: r};
+    },
+    async saveRows(d, p) {
+      const u = Local.user(d, p); let rows = d.rows[u.email] || [];
+      const first = r => r.gid;
+      (p.remove || []).forEach(k => { rows = rows.filter(r => first(r) !== String(k)); });
+      (p.upsert || []).forEach(r => { const i = rows.findIndex(x => first(x) === first(r)); if (i >= 0) rows[i] = r; else rows.push(r); });
+      d.rows[u.email] = rows; return {};
+    },
+    async transferGen(d, p) {
+      const u = Local.user(d, p), to = String(p.to || '').trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error('Please enter a valid email.');
+      if (to === u.email) throw new Error('This generation already belongs to this account.');
+      if (!d.users.some(x => x.email === to)) throw new Error('No account found with this email. Ask them to sign up first.');
+      const mine = d.rows[u.email] || [], by = {}; mine.forEach(r => { by[r.gid] = r; });
+      if (!by[p.gid]) throw new Error('Generation not found.');
+      const set = {}, queue = [p.gid];
+      while (queue.length) {
+        const id = queue.shift(); if (set[id]) continue; set[id] = true;
+        const cv = by[id].conv.split(','), lk = by[id].links.split(',');
+        cv.forEach((c, k) => { const l = (lk[k] || '').trim(); if ((c === 'So' || c === 'Da') && by[l] && !set[l]) queue.push(l); });
+      }
+      const moved = mine.filter(r => set[r.gid]);
+      d.rows[u.email] = mine.filter(r => !set[r.gid]);   // links stay: the families remain connected across accounts
+      d.rows[to] = (d.rows[to] || []).concat(moved);
+      return {count: moved.length};
+    },
+    async genShareList() { throw new Error('Sharing needs the live Apps Script (not available in demo mode).'); },
+    async genShareAdd() { throw new Error('Sharing needs the live Apps Script (not available in demo mode).'); },
+    async genShareSetMode() { throw new Error('Sharing needs the live Apps Script (not available in demo mode).'); },
+    async genShareRemove() { return {}; },
+    async publicGen(d, p) {
+      const gid = String(p.gid || '').trim();
+      for (const email of Object.keys(d.rows)) {
+        const r = d.rows[email].find(x => x.gid === gid && x.vis === 'Public');
+        if (r) { const hh = String(r.hide || '').split(','); return {row: {...r, images: String(r.images || '').split(',').map((x, i) => hh[i] === 'Yes' ? '' : x).join(',')}}; }
+      }
+      throw new Error('No public generation found with this ID.');
+    },
+    async uploadPhoto(d, p) { Local.user(d, p); return {url: p.dataUrl}; }
+  }
+};
+
+/* S.tree  = only the generations opened so far (people + gens)
+   S.index = light list of ALL this account's generations that have a GID (loaded once at login)
+   S.uidSet = every UID already used in the account (so new UIDs never clash with unopened rows) */
+const S = {token: localStorage.getItem('ga_token') || '', user: null, tree: null, index: [], shared: [], uidSet: new Set(), snap: {}, base: {}, dirty: false, saving: false, timer: null, nav: false};
+async function api(action, p = {}) {
+  return CONFIG.API_URL ? Cloud.call(action, {...p, token: S.token}) : Local.call(action, {...p, token: S.token});
+}
+function clearAuth() { S.token = ''; S.user = null; S.tree = null; S.index = []; S.shared = []; S.uidSet = new Set(); S.snap = {}; S.base = {}; localStorage.removeItem('ga_token'); }
+/* shows the spinner overlay while a row is being fetched from the spreadsheet */
+async function withBusy(fn) {
+  S.nav = true; $('#navBusy').classList.add('show');
+  try { return await fn(); } finally { S.nav = false; $('#navBusy').classList.remove('show'); }
+}
+
+/* =====================================================================
+   FAMILY DATA MODEL
+   tree.people[uid] = {uid(4 digit), name, photo, gender 'm'|'f', married,
+                       ownGen / parentGen  = in-memory gen keys (gen where he/she is father/mother, son/daughter)
+                       upGid / downGid     = the LinkedGID saved in the sheet:
+                                             upGid   (Father/Mother) = GID of their parents' generation
+                                             downGid (Son/Daughter)  = GID of their own family generation}
+   tree.gens[key]   = {key, id (8 digit, created once father+mother are filled),
+                       father, mother (uids), sons[], daughters[] (uids)}
+   Only the generations opened so far are in the tree. The Go button reads upGid / downGid,
+   looks that GID up in S.index and fetches just that one row from the spreadsheet.
+   ===================================================================== */
+const T = () => S.tree;
+const person = uid => S.tree.people[uid];
+const digits = n => { let s = String(1 + Math.floor(Math.random() * 9)); while (s.length < n) s += Math.floor(Math.random() * 10); return s; };
+const isGid = v => /^\d{8}$/.test(String(v || ''));
+const inIndex = gid => S.index.some(e => e.gid === gid);
+const loadedByGid = gid => Object.values(T().gens).find(g => g.id === gid);
+const findGen = ref => (ref && (T().gens[ref] || loadedByGid(ref))) || null;
+const hashOf = key => { const g = T().gens[key]; return g && g.id ? g.id : key; };
+/* the generation (key) a person heads / belongs to, if it is already in memory */
+function ownKey(p) { if (p.ownGen && T().gens[p.ownGen]) return p.ownGen; const g = isGid(p.downGid) && loadedByGid(p.downGid); return g ? g.key : null; }
+function upKey(p) { if (p.parentGen && T().gens[p.parentGen]) return p.parentGen; const g = isGid(p.upGid) && loadedByGid(p.upGid); return g ? g.key : null; }
+/* does that generation exist (in memory, or listed in the GID index)? */
+const hasOwn = p => !!ownKey(p) || isGid(p.downGid);   // also true when that family now belongs to another account
+const hasUp = p => !!upKey(p) || isGid(p.upGid);
+function newUid() { return 'p' + rid(); }   // only an in-memory handle for a person - never saved, never shown
+function newGenId() {
+  const ids = new Set(Object.values(T().gens).map(g => g.id)); S.index.forEach(e => ids.add(e.gid)); let id;
+  do { id = digits(8); } while (ids.has(id));
+  return id;
+}
+function makePerson(gender, extra) {
+  return Object.assign({uid: newUid(), name: '', photo: '', hide: false, gender, married: false, ownGen: null, parentGen: null, upGid: '', downGid: ''}, extra || {});
+}
+function addPerson(p) { T().people[p.uid] = p; S.uidSet.add(p.uid); return p; }
+function createGen(fatherUid, motherUid) {
+  const key = 'g' + fatherUid;   // a person is Father of at most one generation
+  T().gens[key] = {key, id: '', father: fatherUid, mother: motherUid, sons: [], daughters: [], vis: 'Public', created: Date.now()};   // new generations start Public; the owner can switch to Private later
+  [fatherUid, motherUid].forEach(u => { const p = person(u); if (p) { p.ownGen = key; p.married = true; } });
+  return key;
+}
+/* Generation ID is created the moment both Father and Mother details are filled */
+function ensureIds() {
+  let changed = false;
+  for (const g of Object.values(T().gens)) {
+    if (!g.id && person(g.father).name && person(g.mother).name) { g.id = newGenId(); changed = true; }
+  }
+  return changed;
+}
+function deleteGen(key) {
+  const g = T().gens[key]; if (!g) return;
+  delete T().gens[key];
+  if (g.id) S.index = S.index.filter(e => e.gid !== g.id);
+  [g.father, g.mother].forEach(u => {
+    const p = person(u); if (!p) return;
+    if (p.ownGen === key) p.ownGen = null;
+    if (g.id && p.downGid === g.id) p.downGid = '';
+    if (!p.parentGen || !T().gens[p.parentGen]) delete T().people[u];   // keep people who still belong to another family
+  });
+  [...g.sons, ...g.daughters].forEach(u => {
+    const c = person(u); if (!c) return;
+    const k = ownKey(c); if (k) deleteGen(k);
+    delete T().people[u];
+  });
+}
+function deleteChild(key, uid) {
+  const g = T().gens[key], c = person(uid); if (!g || !c) return;
+  g.sons = g.sons.filter(x => x !== uid); g.daughters = g.daughters.filter(x => x !== uid);
+  c.parentGen = null;
+  const k = ownKey(c); if (k) deleteGen(k);
+  delete T().people[uid];
+}
+/* Before deleting, bring the whole family below a generation into memory (they get deleted with it). */
+async function ensureSubtree(key, seen = new Set()) {
+  const g = T().gens[key]; if (!g || seen.has(key)) return; seen.add(key);
+  for (const u of [...g.sons, ...g.daughters]) await ensureDown(person(u), seen);
+}
+async function ensureDown(p, seen = new Set()) {
+  if (!p) return;
+  let k = ownKey(p);
+  if (!k && isGid(p.downGid) && inIndex(p.downGid)) k = await loadGen(p.downGid);
+  if (k) await ensureSubtree(k, seen);
+}
+function childCount(g) { return g.sons.length + g.daughters.length; }
+
+/* =====================================================================
+   SPREADSHEET FORMAT  -  one row per generation
+   gid | names | images | conv | marriage | links   (comma lists, same order)
+   conv: Fa = Father, Mo = Mother, So = Son, Da = Daughter
+   links (LinkedGID): Fa/Mo = GID of their parents' generation ('No' if none)
+                      So/Da = GID of their own family generation ('No' if none)
+                      'Pending' = that generation exists but has no GID yet
+   ===================================================================== */
+const enc = v => String(v || '').replace(/,/g, '%2C');
+const dec = v => String(v || '').trim().replace(/%2C/g, ',');
+const GRP = ['Fa', 'Mo', 'So', 'Da'];
+/* LinkedGID of one person: down = Son/Daughter (own family), otherwise Father/Mother (parents' generation) */
+function linkFor(p, down) {
+  const k = down ? ownKey(p) : upKey(p);
+  if (k) return T().gens[k].id || 'No';      // a generation without a GID is not saved yet
+  const gid = down ? p.downGid : p.upGid;
+  return isGid(gid) ? gid : 'No';      // also kept when that generation belongs to someone else for now
+}
+function rowsFromTree() {
+  const gens = Object.values(T().gens).filter(g => g.id).sort((a, b) => (a.created || 0) - (b.created || 0));   // only generations that already have a GID are saved
+  return gens.map(g => {
+    const mem = [[g.father, 'Fa'], [g.mother, 'Mo'], ...g.sons.map(u => [u, 'So']), ...g.daughters.map(u => [u, 'Da'])];
+    const ps = mem.map(m => person(m[0]));
+    const row = {
+      gid: g.id || 'Pending',
+      names: ps.map(p => String(p.name || '').replace(/\s*,\s*/g, ' ').trim()).join(','),
+      images: ps.map(p => enc(p.photo)).join(','),
+      conv: mem.map(m => m[1]).join(','),
+      marriage: mem.map((m, i) => (m[1] === 'Fa' || m[1] === 'Mo' || ps[i].married) ? 'Yes' : 'No').join(','),
+      links: mem.map((m, i) => {
+        const p = ps[i];
+        if (m[1] === 'Fa' || m[1] === 'Mo') return linkFor(p, false);
+        return p.married ? linkFor(p, true) : 'No';
+      }).join(','),
+      vis: g.vis === 'Public' ? 'Public' : 'Private',
+      hide: ps.map(p => p.hide ? 'Yes' : 'No').join(',')          // Yes = the photo of this person is hidden
+    };
+    Object.defineProperty(row, '_h', {value: mem.map(m => m[0])});   // who is who (not saved, not sent)
+    return row;
+  });
+}
+/* same field order as rowsFromTree, so a freshly loaded row compares equal to what the website would save */
+const normHide = (v, conv) => { const n = String(conv || '').split(',').length, a = String(v || '').split(',').map(x => x.trim()); return Array.from({length: n}, (_, i) => a[i] === 'Yes' ? 'Yes' : 'No').join(','); };
+const normRow = r => ({gid: String(r.gid || '').trim(), names: String(r.names || ''), images: String(r.images || ''), conv: String(r.conv || '').trim(), marriage: String(r.marriage || '').trim(), links: String(r.links || '').trim(), vis: String(r.vis || '').trim() === 'Public' ? 'Public' : 'Private', hide: normHide(r.hide, r.conv)});
+const firstUid = r => r.gid;      // the Gen ID is the row key
+
+/* Put ONE spreadsheet row into the tree. Returns the generation key.
+   The Convertor decides who each list item is: Fa -> father card, Mo -> mother card, So -> son card, Da -> daughter card.
+   A person already in memory keeps his current (possibly unsaved) data. */
+function ingestRow(row, created) {
+  const r = normRow(row), G = r.gid;
+  const conv = r.conv.split(',').map(x => x.trim());
+  const names = r.names.split(','), imgs = r.images.split(','), mar = r.marriage.split(','), lnk = r.links.split(','), hides = r.hide.split(',');
+  let father = '', mother = ''; const sons = [], daughters = [];
+  conv.forEach((c, j) => {
+    if (!GRP.includes(c)) return;
+    const lk = (lnk[j] || '').trim();
+    /* The same person can sit in two generations (Son in the parents' one, Father in his own). The Gen ID links tell us who:
+       - Father/Mother here: the child of the parents' generation whose own-family link is THIS Gen ID
+       - Son/Daughter here: the Father (son) / Mother (daughter) of the linked own-family generation */
+    let p = null;
+    const other = isGid(lk) ? loadedByGid(lk) : null;
+    if (other) {
+      if (c === 'Fa' || c === 'Mo') p = [...other.sons, ...other.daughters].map(person).find(x => x && x.downGid === G) || null;
+      else p = person(c === 'So' ? other.father : other.mother) || null;
+    }
+    if (!p) {
+      const uid = newUid();
+      p = T().people[uid] = {uid, name: (names[j] || '').trim(), photo: dec(imgs[j]), hide: (hides[j] || '').trim() === 'Yes', gender: (c === 'Fa' || c === 'So') ? 'm' : 'f',
+        married: (mar[j] || '').trim().toLowerCase() === 'yes', ownGen: null, parentGen: null, upGid: '', downGid: ''};
+    }
+    if (c === 'Fa' || c === 'Mo') p.upGid = lk; else p.downGid = lk;
+    if (c === 'Fa') father = p.uid; else if (c === 'Mo') mother = p.uid; else if (c === 'So') sons.push(p.uid); else daughters.push(p.uid);
+  });
+  if (!father || !mother) return null;
+  const key = 'g' + G;
+  if (T().gens[key]) return key;
+  T().gens[key] = {key, id: isGid(G) ? G : '', father, mother, sons, daughters, vis: r.vis, mine: row.mine !== false, role: row.role || '', by: row.by || '', created};
+  T().people[father].ownGen = key; T().people[mother].ownGen = key;
+  [...sons, ...daughters].forEach(u => { T().people[u].parentGen = key; });
+  S.snap[G] = JSON.stringify(r);
+  S.base[G] = String(row.upd == null ? '' : row.upd);
+  return key;
+}
+
+/* Go button / Generation ID: find the GID in the list; if that generation is not in memory yet, call just that row from the sheet */
+async function loadGen(gid) {
+  const have = loadedByGid(gid); if (have) return have.key;
+  if (!inIndex(gid)) throw new Error('No generation found with this ID');
+  await settle();
+  const res = await api('getGen', {gid});
+  const e = S.index.find(x => x.gid === gid);
+  const key = ingestRow(res.row, e ? e.created : 0);
+  if (!key) throw new Error('Could not open this generation.');
+  return key;
+}
+async function settle() {   // make sure unsaved edits are already in the sheet before another row is read
+  clearTimeout(S.timer);
+  if (S.dirty) await flushNow();
+  while (S.saving) await sleep(60);
+}
+
+/* ---------------------------- autosave (only changed rows are sent) ---------------------------- */
+function setStatus(s) {
+  const el = $('#saveChip'); if (!el) return;
+  const map = {saved: ['Saved', ''], saving: ['Saving…', 'busy'], error: ['Not saved – tap to retry', 'warn'], idle: ['', '']};
+  const [t, c] = map[s] || map.idle;
+  el.textContent = t; el.className = 'chip ' + c; el.style.display = t ? '' : 'none';
+}
+function touch() { S.dirty = true; setStatus('saving'); clearTimeout(S.timer); S.timer = setTimeout(flushNow, 600); }
+async function flushNow() {
+  if (S.saving) return;
+  clearTimeout(S.timer);
+  while (S.dirty && S.tree) {
+    S.dirty = false; S.saving = true; setStatus('saving');
+    try {
+      const rows = rowsFromTree(), next = {}, upsert = [];
+      rows.forEach(r => { const k = firstUid(r), js = JSON.stringify(r); next[k] = js; if (S.snap[k] !== js) upsert.push(r); });
+      const remove = Object.keys(S.snap).filter(k => !(k in next));
+      let res = {};
+      if (upsert.length || remove.length) res = await api('saveRows', {upsert: upsert.map(r => ({...r, base: S.snap[firstUid(r)] === undefined ? 'NEW' : (S.base[firstUid(r)] || '')})), remove});
+      upsert.forEach(r => {
+        const k = firstUid(r);
+        S.snap[k] = next[k];
+        if (res.upd !== undefined) S.base[k] = String(res.upd);
+      });
+      remove.forEach(k => { delete S.snap[k]; delete S.base[k]; });
+      S.saving = false; setStatus(S.dirty ? 'saving' : 'saved');
+    } catch (e) {
+      S.saving = false;
+      if (/^CONFLICT/.test(e.message)) { S.dirty = false; setStatus('idle'); showConflict(); return; }
+      S.dirty = true; setStatus('error');
+      if (/Session expired|log in/i.test(e.message)) toast(e.message);
+      return;
+    }
+  }
+}
+window.addEventListener('beforeunload', e => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------------------------- router ---------------------------- */
+async function route() {
+  closeModal();
+  while (S.saving) await sleep(60);
+  let parts = location.hash.replace(/^#/, '').split('/').filter(Boolean);
+  if (parts[0] === 'p' && parts[1]) { history.replaceState({pub: parts[1]}, '', '#/view'); parts = ['view']; }   // old link style: hide the Generation ID
+  if (parts[0] === 'view') {                                               // public view: anyone, no login needed. The ID lives in the history state, not in the address
+    const pg = history.state && history.state.pub;
+    if (isGid(pg)) return viewPublic(pg);
+    history.replaceState(null, '', '#/'); parts = [];
+  }
+  if (!S.token) return parts[0] === 'login' ? viewAuth('login') : parts[0] === 'signup' ? viewAuth('signup') : viewLanding();
+  if (!S.user) {
+    try { S.user = (await api('me')).user; } catch (e) { clearAuth(); return viewAuth('login'); }
+  }
+  if (!S.tree) {
+    setView(`${topbar(brand)}<div class="loading"><span class="spin dark" style="width:28px;height:28px"></span></div>`);
+    try {
+      /* login: only the light list of generations (GIDs) is loaded. Rows still without a GID come in full. */
+      const r = await api('loadIndex');
+      S.tree = {gens: {}, people: {}}; S.index = []; S.shared = r.shared || []; S.uidSet = new Set(); S.snap = {}; S.base = {}; S.dirty = false;
+      (r.rows || []).forEach((e, i) => {
+        if (e.full) ingestRow(e.row, i);
+        else S.index.push({...e, created: i});
+      });
+    }
+    catch (e) { S.tree = null; if (/Session expired|log in/i.test(e.message)) { clearAuth(); return viewAuth('login'); } return setView(`${topbar(brand)}<div class="empty">${esc(e.message)}<br><br><button class="btn" onclick="route()">Try again</button></div>`); }
+  }
+  window.scrollTo(0, 0);
+  if (parts[0] === 'g' && parts[1]) {
+    let g = findGen(parts[1]);
+    if (!g && isGid(parts[1]) && inIndex(parts[1])) {          // opened by a Generation ID link / page refresh
+      try { await withBusy(() => loadGen(parts[1])); g = findGen(parts[1]); } catch (e) { toast(e.message); }
+    }
+    if (g) return viewGen(g.key);
+  }
+  return viewHome();
+}
+let routeT = 0;
+const schedRoute = () => { clearTimeout(routeT); routeT = setTimeout(route, 0); };   // hashchange + popstate can both fire: route only once
+window.addEventListener('hashchange', schedRoute);
+window.addEventListener('popstate', schedRoute);
+const go = h => { if (location.hash === h) route(); else location.hash = h; };
+/* open somebody else's / a public generation: the address bar only shows #/view, never the Generation ID */
+function goPub(gid) { history.pushState({pub: gid}, '', '#/view'); route(); }
+
+/* ---------------------------- AUTH ---------------------------- */
+function viewAuth(mode) {
+  const signup = mode === 'signup';
+  const tab = (m, label) => `<button class="${mode === m ? 'on' : ''}" data-mode="${m}">${label}</button>`;
+  const fields = `
+        ${signup ? `<label class="field"><span>Your name</span><input class="input" id="fName" autocomplete="name" placeholder="e.g. Rahul Sharma"></label>` : ''}
+        <label class="field"><span>Email</span><input class="input" id="fEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+        <label class="field"><span>Password</span>
+          <div class="pwrow"><input class="input" id="fPass" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" placeholder="${signup ? 'At least 6 characters' : 'Your password'}" style="padding-right:64px">
+          <button type="button" class="eye" id="eye">Show</button></div>
+        </label>
+        ${signup ? '' : '<div class="forgot"><button type="button" class="linkbtn" id="forgotBtn">Forgot password?</button></div>'}`;
+  setView(`
+  <div class="auth"><div class="auth-box">
+    ${brand}
+    <p class="tag">Keep every generation of your family in one place.</p>
+    <div class="panel">
+      <div class="tabs">
+        ${tab('login', 'Log in')}${tab('signup', 'Sign up')}
+      </div>
+      <form id="authForm" novalidate>
+        <div class="err" id="authErr"></div>${fields}
+        <button class="btn block" id="authBtn" type="submit">${signup ? 'Create account' : 'Log in'}</button>
+      </form>
+      ${CONFIG.API_URL ? '' : '<div class="demo">Demo mode: accounts and data are saved only in this browser. Add your Apps Script URL in <b>CONFIG.API_URL</b> to go live.</div>'}
+    </div>
+  </div></div>`);
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => viewAuth(b.dataset.mode));
+  const fb = $('#forgotBtn'); if (fb) fb.onclick = () => viewForgot($('#fEmail').value);
+  $('#eye').onclick = () => { const i = $('#fPass'); const h = i.type === 'password'; i.type = h ? 'text' : 'password'; $('#eye').textContent = h ? 'Hide' : 'Show'; };
+  $('#authForm').onsubmit = async e => {
+    e.preventDefault();
+    const err = $('#authErr'); err.classList.remove('show');
+    const btn = $('#authBtn'); const label = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+    try {
+      const body = {email: $('#fEmail').value, password: $('#fPass').value}; if (signup) body.name = $('#fName').value;
+      const r = await api(signup ? 'register' : 'login', body);
+      S.token = r.token; S.user = r.user; S.tree = null; localStorage.setItem('ga_token', r.token);
+      go('#/');
+    } catch (ex) { err.textContent = ex.message; err.classList.add('show'); btn.disabled = false; btn.textContent = label; }
+  };
+}
+function viewForgot(prefill) {
+  setView(`
+  <div class="auth"><div class="auth-box">
+    ${brand}
+    <p class="tag">Enter your account email and we will send you a new password.</p>
+    <div class="panel">
+      <form id="fpForm" novalidate>
+        <div class="err" id="fpErr"></div><div class="okmsg" id="fpOk"></div>
+        <label class="field"><span>Email</span><input class="input" id="fpEmail" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(prefill || '')}"></label>
+        <button class="btn block" id="fpBtn" type="submit">Send new password</button>
+      </form>
+      <p style="text-align:center;margin:14px 0 0"><button type="button" class="linkbtn" id="fpBack">Back to log in</button></p>
+    </div>
+  </div></div>`);
+  $('#fpBack').onclick = () => viewAuth('login');
+  $('#fpForm').onsubmit = async e => {
+    e.preventDefault();
+    const er = $('#fpErr'), ok = $('#fpOk'), btn = $('#fpBtn'), label = btn.textContent;
+    er.classList.remove('show'); ok.classList.remove('show');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+    try {
+      await api('forgotPassword', {email: $('#fpEmail').value});
+      ok.textContent = 'If this email has an account, a new password has been sent to it. Check your inbox and spam folder, log in with it, then change it from Menu > My account.';
+      ok.classList.add('show');
+    } catch (ex) { er.textContent = ex.message; er.classList.add('show'); }
+    btn.disabled = false; btn.textContent = label;
+  };
+}
+async function logout() {
+  await flushNow();
+  try { await api('logout'); } catch (e) {}
+  clearAuth(); go('#/');
+}
+
+/* ---------------------------- HOME (all generations) ---------------------------- */
+function genTitle(g) {
+  const f = person(g.father), m = person(g.mother);
+  return (f.name || 'Father') + ' & ' + (m.name || 'Mother');
+}
+/* One card per generation: opened ones come from memory, the others from the light GID list. */
+function homeItems() {
+  const seen = new Set();
+  const items = Object.values(T().gens).filter(g => g.id).map(g => {   // no GID yet = not listed
+    if (g.id) seen.add(g.id);
+    return {created: g.created || 0, ref: g.key, id: g.id, vis: g.vis, mine: g.mine !== false, role: g.role || '', by: g.by, title: genTitle(g), fa: person(g.father), mo: person(g.mother), sons: g.sons.length, daughters: g.daughters.length};
+  });
+  S.index.forEach(e => {
+    if (seen.has(e.gid)) return;
+    items.push({created: e.created, ref: 'gid:' + e.gid, id: e.gid, vis: e.vis, mine: e.mine !== false, by: e.by, title: (e.fa || 'Father') + ' & ' + (e.mo || 'Mother'),
+      fa: {name: e.fa, photo: dec(e.faImg)}, mo: {name: e.mo, photo: dec(e.moImg)}, sons: e.sons, daughters: e.daughters});
+  });
+  return items.sort((a, b) => a.created - b.created);
+}
+function viewHome() {
+  const gens = homeItems();
+  setView(`${topbar(`${brand}<div class="grow"></div><button class="iconbtn" id="menuBtn" aria-label="Menu">&#9776;</button>`)}
+  ${CONFIG.API_URL ? '' : '<div class="banner">Demo mode – data is stored only in this browser</div>'}
+  <main class="wrap">
+    <div class="hello"><div><h2>Hello, ${esc(S.user.name.split(' ')[0])}</h2><p>${gens.length || S.shared.length ? 'Your generations' : 'Start your family tree'}</p></div>
+    <button class="btn" id="addGen">+ Add Generation</button></div>
+    ${gens.length || S.shared.length ? `<form class="findbar" id="findForm"><input class="input" id="findId" inputmode="numeric" maxlength="9" placeholder="Go to Generation ID (8 digits)"><button class="btn" type="submit">Go</button></form>` : ''}
+    ${gens.length ? `<div class="grid">${gens.map(g => `
+      <div class="gcard" data-open="${esc(g.ref)}" tabindex="0">
+        <div class="toprow"><div class="pair">${[g.fa, g.mo].map(q => `<span class="mini">${pic(q) ? `<img src="${esc(pic(q))}" alt="" referrerpolicy="no-referrer">` : esc(initials(q.name))}</span>`).join('')}</div></div>
+        ${g.id ? `<span class="gid">${fmtGid(g.id)}</span>` : '<span class="gid pend">ID pending</span>'}
+        <h3>${esc(g.title)}</h3>
+        <div class="meta">${g.sons} son${g.sons === 1 ? '' : 's'} · ${g.daughters} daughter${g.daughters === 1 ? '' : 's'}</div>
+        ${g.mine === false ? `<div class="meta"><span class="chip sharedchip">Admin mode · by ${esc(g.by || 'family')}</span></div>` : `<div class="gbar">
+          ${g.id ? `<button class="gbtn ${g.vis === 'Public' ? 'pub' : ''}" data-vis="${esc(g.ref)}" aria-label="Change Private or Public">${g.vis === 'Public' ? ICON_GLOBE + 'Public' : ICON_LOCK + 'Private'}</button>
+          <button class="gbtn" data-share="${esc(g.ref)}" data-title="${esc(g.title)}" aria-label="Share generation">${ICON_SHARE}Share</button>
+          <button class="gbtn" data-transfer="${esc(g.ref)}" data-title="${esc(g.title)}" aria-label="Transfer generation">${ICON_SEND}Transfer</button>` : ''}
+          <button class="gbtn dl" data-del="${esc(g.ref)}" data-title="${esc(g.title)}" aria-label="Delete generation">${ICON_TRASH}Delete</button></div>`}
+      </div>`).join('')}</div>`
+    : S.shared.length ? '' : `<div class="empty"><div class="logo" style="margin:0 auto 14px;width:56px;height:56px;border-radius:12px"><span style="display:block;width:30px">${ICON_TREE}</span></div>
+       <h3 style="margin-bottom:6px">No generation yet</h3><p style="margin:0 0 16px">Tap <b>Add Generation</b> to create Father and Mother cards, then add sons and daughters.</p></div>`}
+    ${S.shared.length ? `<div class="sec-t">Shared with you (view only)</div><div class="grid">${S.shared.map(sharedInfo).map(x => `
+      <div class="gcard" data-open="share:${esc(x.gid)}" tabindex="0">
+        <div class="toprow"><div class="pair">${miniAv(x.fa)}${miniAv(x.mo)}</div></div>
+        <h3>${esc(x.title)}</h3>
+        <div class="meta">${x.sons} son${x.sons === 1 ? '' : 's'} · ${x.daughters} daughter${x.daughters === 1 ? '' : 's'}</div>
+        <div class="meta"><span class="chip sharedchip">View only · shared by ${esc(x.by || 'family')}</span></div>
+      </div>`).join('')}</div>` : ''}
+  </main>`);
+  $('#menuBtn').onclick = openMenu;
+  const ag = $('#addGen'); if (ag) ag.onclick = addGeneration;
+  const ff = $('#findForm');
+  if (ff) ff.onsubmit = e => { e.preventDefault(); goToId($('#findId').value); };
+  document.querySelector('main').onclick = e => {
+    const del = e.target.closest('[data-del]');
+    if (del) { e.stopPropagation(); return confirmDeleteGen(del.dataset.del, del.dataset.title); }
+    const vb = e.target.closest('[data-vis]');
+    if (vb) { e.stopPropagation(); return homeVis(vb.dataset.vis); }
+    const sb = e.target.closest('[data-share]');
+    if (sb) { e.stopPropagation(); return openShareGen(sb.dataset.share, sb.dataset.title); }
+    const tb = e.target.closest('[data-transfer]');
+    if (tb) { e.stopPropagation(); return openTransfer(tb.dataset.transfer, tb.dataset.title); }
+    const open = e.target.closest('[data-open]');
+    if (open) openRef(open.dataset.open);
+  };
+}
+/* ref = an opened generation's key, or 'gid:12345678' for one that is only in the GID list */
+function openRef(ref) {
+  if (ref.startsWith('share:')) { const g = ref.slice(6); delete PV[g]; return goPub(g); }   // somebody else's generation: read-only page
+  if (ref.startsWith('gid:')) return openGid(ref.slice(4));
+  go('#/g/' + hashOf(ref));
+}
+async function openGid(gid) {
+  if (S.nav) return;
+  try { await withBusy(() => loadGen(gid)); go('#/g/' + gid); } catch (e) { toast(e.message); }
+}
+function menuGen(ref, title, fa, mo, sub) {
+  return `<button class="menu-i gi" data-ref="${esc(ref)}"><span class="mpair">${miniAv(fa)}${miniAv(mo)}</span><span class="mtxt"><b>${esc(title)}</b><small>${esc(sub)}</small></span></button>`;
+}
+/* ---------- Add to Home Screen (PWA) ---------- */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+window.addEventListener('appinstalled', () => { deferredInstall = null; toast && toast('App installed. Open it from your home screen.'); });
+function isInstalled() {
+  return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+}
+async function installApp() {
+  if (deferredInstall) {                                  // Android Chrome / Edge / Samsung Internet: one tap install (a real app is added)
+    const p = deferredInstall; deferredInstall = null;
+    try { p.prompt(); await p.userChoice; } catch (e) {}
+    return;
+  }
+  const ua = navigator.userAgent || '';
+  const inApp = /FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|; wv\)|GSA\//i.test(ua);
+  const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let body;
+  if (inApp) body = `<p>This link is open inside another app, which cannot install websites.</p><ol class="how"><li>Tap the <b>&#8942;</b> or <b>Share</b> button of this screen.</li><li>Choose <b>Open in Chrome</b> (or Safari).</li><li>Then open <b>Menu &gt; Add to Home Screen</b> again.</li></ol>`;
+  else if (ios) body = `<ol class="how"><li>Open this website in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (square with an arrow).</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>`;
+  else body = `<ol class="how"><li>Open this website in <b>Chrome</b>.</li><li>Tap the <b>&#8942;</b> menu (top right).</li><li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li></ol><p class="note">If you do not see it yet, use the website for a few seconds and try again.</p>`;
+  const m = modal(`<h3>Add to Home Screen</h3>${body}<div class="row"><button class="btn" id="c">Got it</button></div>`);
+  m.querySelector('#c').onclick = closeModal;
+}
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+function openMenu() {
+  const ov = document.createElement('div'); ov.className = 'menuov';
+  ov.innerHTML = `<div class="menu" role="dialog" aria-modal="true">
+    <div class="menu-h"><span class="avatar">${esc(initials(S.user.name))}</span>
+      <div class="who"><b>${esc(S.user.name)}</b><small>${esc(S.user.email || '')}</small></div>
+      <button class="iconbtn" id="mClose" aria-label="Close">&#10005;</button></div>
+    <div class="menu-b">
+      <button class="menu-i" id="mAcc">My account<small>Change name or password</small></button>
+      ${isInstalled() ? '' : `<button class="menu-i" id="mInstall">Add to Home Screen<small>Install Generation Album as an app on this phone</small></button>`}
+      <button class="menu-i" id="mRefresh">Refresh<small>Get the latest changes made from other phones</small></button>
+      ${S.shared.length ? `<div class="menu-t">Shared with you (${S.shared.length})</div>` + S.shared.map(sharedInfo).map(x => menuGen('share:' + x.gid, x.title, x.fa, x.mo, `view only · by ${x.by || 'family'}`)).join('') : ''}
+    </div>
+    <div class="menu-f"><button class="btn danger" id="mOut">Log out</button></div></div>`;
+  document.body.appendChild(ov);
+  const close = () => ov.remove();
+  ov.onclick = e => {
+    if (e.target === ov || e.target.closest('#mClose')) return close();
+    if (e.target.closest('#mAcc')) { close(); return openProfile(); }
+    if (e.target.closest('#mInstall')) { close(); return installApp(); }
+    if (e.target.closest('#mRefresh')) { close(); return reloadAll(); }
+    if (e.target.closest('#mOut')) { close(); return logout(); }
+    const it = e.target.closest('[data-ref]');
+    if (it) { close(); openRef(it.dataset.ref); }
+  };
+}
+function openProfile() {
+  const m = modal(`<h3>My account</h3>
+    <div class="err" id="uErr"></div>
+    <label class="field"><span>Name</span><input class="input" id="uName" maxlength="60" value="${esc(S.user.name)}"></label>
+    <label class="field"><span>Email</span><input class="input" value="${esc(S.user.email)}" disabled></label>
+    <p class="note" style="margin:0 0 8px"><b>Change password</b> (leave empty to keep the old one)</p>
+    <label class="field"><span>Current password</span><input class="input" id="uOld" type="password" autocomplete="current-password"></label>
+    <label class="field"><span>New password (min 6)</span><input class="input" id="uNew" type="password" autocomplete="new-password"></label>
+    <div class="row"><button class="btn ghost" id="cl">Close</button><button class="btn" id="sv">Update</button></div>
+    <div class="row"><button class="btn danger" id="lo">Log out</button></div>`);
+  m.querySelector('#lo').onclick = () => { closeModal(); logout(); };
+  m.querySelector('#cl').onclick = closeModal;
+  m.querySelector('#sv').onclick = async () => {
+    const er = m.querySelector('#uErr'); er.classList.remove('show');
+    const btn = m.querySelector('#sv'); btn.disabled = true;
+    try {
+      const r = await api('updateProfile', {name: m.querySelector('#uName').value, oldPassword: m.querySelector('#uOld').value, newPassword: m.querySelector('#uNew').value});
+      S.user = r.user; closeModal(); toast('Account updated'); viewHome();
+    } catch (ex) { er.textContent = ex.message; er.classList.add('show'); btn.disabled = false; }
+  };
+}
+function goToId(raw) {
+  const id = String(raw || '').replace(/\D/g, '');
+  if (id.length !== 8) return toast('Enter the 8 digit Generation ID');
+  closeModal();
+  if (S.tree && (loadedByGid(id) || inIndex(id))) return openGid(id);
+  openPublic(id);                      // not one of my generations -> try a public one
+}
+function openGoToId() {
+  const m = modal(`<h3>Go to Generation ID</h3><label class="field"><span>8 digit Generation ID</span><input class="input" id="gi" inputmode="numeric" maxlength="9" placeholder="e.g. 4829 1736" style="letter-spacing:.1em;font-weight:600"></label>
+    <div class="row"><button class="btn ghost" id="c">Cancel</button><button class="btn" id="ok">Go</button></div>`);
+  const i = m.querySelector('#gi'); i.focus();
+  m.querySelector('#c').onclick = closeModal; m.querySelector('#ok').onclick = () => goToId(i.value);
+  i.onkeydown = e => { if (e.key === 'Enter') goToId(i.value); };
+}
+function addGeneration() {
+  const f = addPerson(makePerson('m')), mo = addPerson(makePerson('f'));
+  const key = createGen(f.uid, mo.uid);
+  touch(); go('#/g/' + key);
+}
+function confirmDeleteGen(ref, title) {
+  const m = modal(`<h3>Delete generation?</h3><p style="margin:0 0 8px">“${esc(title || 'This generation')}”, its sons and daughters, and every family below them will be permanently deleted.</p>
+    <div class="row"><button class="btn ghost" id="c">Cancel</button><button class="btn danger" id="ok">Delete</button></div>`);
+  m.querySelector('#c').onclick = closeModal;
+  m.querySelector('#ok').onclick = async () => {
+    closeModal();
+    try {
+      await withBusy(async () => {
+        const key = ref.startsWith('gid:') ? await loadGen(ref.slice(4)) : ref;
+        await ensureSubtree(key);                 // everything below must be in memory so it is deleted too
+        deleteGen(key);
+      });
+      touch(); toast('Generation deleted'); viewHome();
+    } catch (e) { toast(e.message); }
+  };
+}
+
+/* reload everything from the spreadsheet (latest changes of the other phones) */
+async function reloadAll(force) {
+  if (!force) {
+    try { await settle(); } catch (e) {}
+    if (S.dirty) return toast('Unsaved changes could not be saved. Try again.');
+  }
+  S.tree = null; S.index = []; S.snap = {}; S.base = {}; S.dirty = false;
+  go('#/');
+}
+/* shown when the sheet says someone else saved the same family first */
+function showConflict() {
+  const m = modal(`<h3>Changed on another phone</h3>
+    <p style="margin:0 0 14px">This family was updated from another phone, so your last change was not saved. Reload to see the latest version, then make the change again.</p>
+    <div class="row"><button class="btn" id="rl">Reload</button></div>`);
+  m.querySelector('#rl').onclick = () => { closeModal(); reloadAll(true); };
+}
+/* Share ONE generation. Every person added gets a mode:
+   View Mode  = can only look.   Admin Mode = can edit / update THIS generation and add the family of a married person (that new generation is theirs),
+   but cannot transfer, share, change Private / Public or delete it. Only the owner can add people or switch their mode. */
+function openShareGen(ref, title) {
+  const rg = T().gens[ref] || loadedByGid(String(ref).replace(/^gid:/, ''));
+  const gid = rg ? rg.id : String(ref).replace(/^gid:/, '');
+  if (!isGid(gid)) return;
+  const m = modal(`<h3>Share generation</h3><p style="margin:0 0 10px">“${esc(title || 'This generation')}” <b>${fmtGid(gid)}</b></p><div id="shBody"><p class="note">Loading…</p></div>`);
+  const body = m.querySelector('#shBody');
+  const load = async () => {
+    let d;
+    try { d = await api('genShareList', {gid}); }
+    catch (e) { body.innerHTML = `<div class="err show">${esc(e.message)}</div><div class="row"><button class="btn ghost" id="shClose">Close</button></div>`; body.querySelector('#shClose').onclick = closeModal; return; }
+    body.innerHTML = `
+      <p class="note" style="margin:0 0 12px">Add a person and choose a mode. They need an account first. You stay the admin and can remove anyone or change their mode at any time.</p>
+      <div class="err" id="shErr"></div>
+      <input class="input" id="shMail" type="email" autocomplete="off" placeholder="Email to share with" style="letter-spacing:0;font-weight:500;border-color:var(--line);margin-bottom:10px">
+      <div class="modebox">
+        <label class="chk"><input type="checkbox" id="shV" checked><span>View Mode<small>Can only look at this generation.</small></span></label>
+        <label class="chk"><input type="checkbox" id="shE"><span>Admin Mode<small>Can edit and update this generation and add the family of a married person. Cannot transfer, share, change Private / Public or delete.</small></span></label>
+      </div>
+      <button class="btn block" id="shAdd" style="margin-bottom:12px">Add</button>
+      <div class="menu-t" style="margin-top:4px">Shared with</div>
+      ${d.viewers.length ? d.viewers.map(x => `<div class="shrow"><span>${esc(x.name || x.email)}<small>${esc(x.email)}</small><span class="mchip ${x.mode === 'E' ? 'adm' : ''}">${x.mode === 'E' ? 'Admin Mode' : 'View Mode'}</span></span>
+        <span class="acts"><button class="btn sm ghost" data-mode="${x.mode === 'E' ? 'V' : 'E'}" data-em="${esc(x.email)}">${x.mode === 'E' ? 'Make View only' : 'Make Admin'}</button><button class="btn sm danger" data-rm="${esc(x.email)}">Remove</button></span></div>`).join('') : '<p class="note" style="margin:2px 0 8px">Not shared with anyone.</p>'}
+      <div class="row"><button class="btn ghost" id="shClose">Close</button></div>`;
+    const fail = ex => { const er = body.querySelector('#shErr'); er.textContent = ex.message; er.classList.add('show'); };
+    body.querySelector('#shClose').onclick = closeModal;
+    const cv = body.querySelector('#shV'), ce = body.querySelector('#shE');      // exactly one of the two is always ticked
+    cv.onchange = () => { ce.checked = !cv.checked; };
+    ce.onchange = () => { cv.checked = !ce.checked; };
+    const add = async () => {
+      const btn = body.querySelector('#shAdd'); btn.disabled = true;
+      const mode = ce.checked ? 'E' : 'V';
+      try { await api('genShareAdd', {gid, email: body.querySelector('#shMail').value, mode}); toast(mode === 'E' ? 'Shared in Admin Mode' : 'Shared in View Mode'); await load(); }
+      catch (ex) { fail(ex); btn.disabled = false; }
+    };
+    body.querySelector('#shAdd').onclick = add;
+    body.querySelector('#shMail').onkeydown = e => { if (e.key === 'Enter') add(); };
+    body.querySelectorAll('[data-mode]').forEach(b => b.onclick = async () => {
+      b.disabled = true;
+      try { await api('genShareSetMode', {gid, email: b.dataset.em, mode: b.dataset.mode}); toast(b.dataset.mode === 'E' ? 'Now in Admin Mode' : 'Now in View Mode'); await load(); } catch (ex) { fail(ex); b.disabled = false; }
+    });
+    body.querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => {
+      try { await api('genShareRemove', {gid, email: b.dataset.rm}); toast('Removed'); await load(); } catch (ex) { fail(ex); }
+    });
+  };
+  load();
+}
+
+/* the generation + every generation below it (the ones that move together in a transfer) */
+function subtreeGens(rootKey) {
+  const seen = new Set(), out = [];
+  (function walk(k) {
+    const g = k && T().gens[k];
+    if (!g || !g.id || seen.has(k)) return;
+    seen.add(k); out.push(g);
+    [...g.sons, ...g.daughters].forEach(uid => { const p = person(uid); if (p && p.married) walk(ownKey(p)); });
+  })(rootKey);
+  return out;
+}
+/* Transfer = hand the generation (and all generations below it) to another account. The new owner becomes its admin and
+   it disappears from this account. Needs the account password. A main generation shows a red alert first. */
+function openTransfer(ref, title) {
+  const rg = T().gens[ref] || loadedByGid(String(ref).replace(/^gid:/, ''));
+  const gid = rg ? rg.id : String(ref).replace(/^gid:/, '');
+  if (!isGid(gid)) return;
+  const sub = rg ? subtreeGens(rg.key) : [], n = Math.max(sub.length, 1);
+  const shown = sub.slice(0, 8).map(g => `<li>${esc(genTitle(g))} <small>${fmtGid(g.id)}</small></li>`).join('') + (sub.length > 8 ? `<li>…and ${sub.length - 8} more</li>` : '');
+  const alertHtml = n > 1
+    ? `<div class="alertbox"><b>&#9888; Main generation – ${n} connected generations will be transferred</b>
+        Every generation below this one moves together with it:<ul>${shown}</ul>
+        You will lose admin control (Share and Transfer) of <b style="display:inline">ALL ${n}</b> of them, and they will disappear from your account.</div>`
+    : `<div class="alertbox"><b>&#9888; You will lose admin control</b>This generation moves to the other account. You will no longer be able to open, share or transfer it.</div>`;
+  const m = modal(`<h3>Transfer generation</h3>
+    <p style="margin:0 0 10px">“${esc(title || 'This generation')}” <b>${fmtGid(gid)}</b></p>
+    ${alertHtml}
+    <div class="err" id="tErr"></div>
+    <label class="field"><span>Email of the new admin</span><input class="input" id="tMail" type="email" autocomplete="off" placeholder="name@gmail.com"></label>
+    <label class="field"><span>Your account password</span><input class="input" id="tPw" type="password" autocomplete="current-password" placeholder="Enter your password to confirm"></label>
+    ${n > 1 ? `<label class="chk"><input type="checkbox" id="tOk"><span>I understand. Transfer all ${n} generations and give up admin control of them.</span></label>` : ''}
+    <p class="note" style="margin:0 0 14px">The new admin must already have an account. Anyone this generation was shared with loses access; the new admin decides who can view it. The link to the generation above stays connected - it opens only if that generation is Public.</p>
+    <div class="row"><button class="btn ghost" id="c">Cancel</button><button class="btn danger" id="ok">Transfer</button></div>`);
+  const mail = m.querySelector('#tMail'); mail.focus();
+  m.querySelector('#c').onclick = closeModal;
+  const go_ = async () => {
+    const er = m.querySelector('#tErr'), btn = m.querySelector('#ok'); er.classList.remove('show');
+    const fail = t => { er.textContent = t; er.classList.add('show'); };
+    const to = mail.value.trim().toLowerCase(), password = m.querySelector('#tPw').value;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return fail('Please enter a valid email.');
+    if (S.user && to === String(S.user.email).toLowerCase()) return fail('This is your own email.');
+    if (!password) return fail('Please enter your account password.');
+    if (n > 1 && !m.querySelector('#tOk').checked) return fail('Please tick the box to confirm that all ' + n + ' generations will be transferred.');
+    btn.disabled = true;
+    try {
+      let res = {};
+      await withBusy(async () => {
+        await settle();
+        if (S.dirty) throw new Error('Unsaved changes could not be saved. Try again.');
+        res = await api('transferGen', {gid, to, password});
+      });
+      closeModal(); S.tree = null; S.index = []; S.snap = {}; S.base = {};
+      const c = res.count || n;
+      toast(c + ' generation' + (c === 1 ? '' : 's') + ' transferred to ' + to); go('#/');
+    } catch (ex) { fail(ex.message); btn.disabled = false; }
+  };
+  m.querySelector('#ok').onclick = go_;
+  mail.onkeydown = e => { if (e.key === 'Enter') m.querySelector('#tPw').focus(); };
+  m.querySelector('#tPw').onkeydown = e => { if (e.key === 'Enter') go_(); };
+}
+
+/* ---------------------------- GENERATION VIEW ---------------------------- */
+const ARROW_L = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>`;
+const ICON_PLUS_SM = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
+const ARROW_R = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>`;
+const ICON_COPY = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>`;
+const ICON_LOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+const ICON_GLOBE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/></svg>`;
+const ICON_SEND = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg>`;
+const ICON_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>`;
+const ICON_SHARE =`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M19 8v6M16 11h6"/></svg>`;
+const miniAv = q => `<span class="mini">${pic(q) ? `<img src="${esc(pic(q))}" alt="" referrerpolicy="no-referrer">` : esc(initials(q ? q.name : ''))}</span>`;
+/* a generation somebody shared with me (view only): the row as the server sends it -> what a card needs */
+function sharedInfo(e) {
+  const g = parsePub(e);
+  return {gid: e.gid, by: e.by, title: ((g.father && g.father.name) || 'Father') + ' & ' + ((g.mother && g.mother.name) || 'Mother'),
+          fa: g.father || {name: '', photo: ''}, mo: g.mother || {name: '', photo: ''}, sons: g.sons.length, daughters: g.daughters.length};
+}
+const ROLE_NAME = {father: 'Father', mother: 'Mother', son: 'Son', daughter: 'Daughter'};
+
+/* Card = photo + name (+ Go button). Everything else lives in the details form.
+   Go button: LEFT for father/son, RIGHT for mother/daughter. Children get it only once married. */
+function personCard(p, role, key) {
+  const tag = ROLE_NAME[role];
+  const filled = !!p.name;
+  const left = role === 'father' || role === 'son';
+  const isParent = role === 'father' || role === 'mother';
+  /* Go button (arrow) when the linked generation exists. A married person (or a Father / Mother) whose generation is not added yet gets a Plus button instead. */
+  const hasLink = isParent ? hasUp(p) : hasOwn(p);
+  const canAdd = filled && !hasLink && (isParent || p.married);
+  const hasGo = filled && hasLink;
+  const photo = `<div class="photo">${pic(p) ? `<img src="${esc(pic(p))}" alt="" referrerpolicy="no-referrer">` : ICON_USER}${filled ? '' : '<span class="plus">+</span>'}${p.hide && p.photo ? '<span class="hidtag">Photo hidden</span>' : ''}</div>`;
+  const name = `<div class="pname ${filled ? '' : 'ph'}">${esc(filled ? p.name : 'Add ' + tag)}</div>`;
+  const btn = hasGo ? `<button class="gobtn" data-nav="${p.uid}" aria-label="${isParent ? 'Open ' + tag + '’s parents' : 'Open family'}">${left ? ARROW_L : ARROW_R}</button>`
+    : canAdd ? `<button class="gobtn add" data-nav="${p.uid}" aria-label="${isParent ? 'Add ' + tag + '’s parents generation' : 'Add family generation'}">${ICON_PLUS_SM}</button>` : '<span class="gap"></span>';
+  const uidTxt = `<span class="uid">${esc(tag)}</span>`;
+  const head = `<div class="chead">${left ? btn + uidTxt : uidTxt + btn}</div>`;
+  return `<div class="card">${head}<button class="cmain" data-person="${p.uid}" data-role="${role}">${photo}${name}</button></div>`;
+}
+
+function viewGen(key) {
+  const g = T().gens[key];
+  const F = person(g.father), M = person(g.mother);
+  const kids = (list, role) => list.length ? `<div class="stack">${list.map(u => personCard(person(u), role, key)).join('')}</div>` : '';
+  setView(`${topbar(`<a class="iconbtn" href="#/" aria-label="All generations">&#8592;</a><div class="grow"></div>
+    <button class="chip" id="saveChip" style="display:none"></button>
+    <button class="iconbtn" id="findBtn" aria-label="Go to Generation ID"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg></button>`)}
+  <div class="gtop">
+    ${g.mine === false ? `<div class="vnote" style="margin:0 auto 8px">Admin Mode · shared by ${esc(g.by || 'family')}. You can edit this generation.</div>` : ''}
+    ${g.id ? `<button class="gid-btn" id="gidBtn" title="Copy Generation ID"><span class="k">Gen ID</span>${fmtGid(g.id)}<span class="cp">${ICON_COPY}</span></button>`
+           : `<div class="gid-pend">Fill both <b>Father</b> and <b>Mother</b> details to create the Generation ID.</div>`}
+  </div>
+  <div class="couple">
+    <div class="colm">
+      ${personCard(F, 'father', key)}
+      ${g.id ? `<button class="addbtn son" data-addchild="m">+ Add Son</button>` : ''}
+      ${g.sons.length ? kids(g.sons, 'son') : ''}
+    </div>
+    <div class="colm">
+      ${personCard(M, 'mother', key)}
+      ${g.id ? `<button class="addbtn daughter" data-addchild="f">+ Add Daughter</button>` : ''}
+      ${g.daughters.length ? kids(g.daughters, 'daughter') : ''}
+    </div>
+  </div>`);
+  $('#findBtn').onclick = openGoToId;
+  const sc = $('#saveChip'); if (sc) sc.onclick = flushNow;
+  setStatus(S.dirty ? 'saving' : 'idle');
+  const gb = $('#gidBtn');
+  if (gb) gb.onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(g.id) : Promise.reject()).then(() => toast('Generation ID copied'), () => toast(g.id));
+}
+
+/* Home card button: the generation may only be in the GID list, so bring that one row in first */
+async function homeVis(ref) {
+  if (S.nav) return;
+  try {
+    const key = ref.startsWith('gid:') ? await withBusy(() => loadGen(ref.slice(4))) : ref;
+    toggleVis(key);
+  } catch (e) { toast(e.message); }
+}
+/* Private <-> Public. Public needs a confirmation (it opens the generation to everyone who has the ID). */
+function toggleVis(key) {
+  const g = T().gens[key]; if (!g || !g.id) return;
+  if (g.vis === 'Public') return setVis(key, 'Private');
+  const m = modal(`<h3>Make this generation Public?</h3>
+    <p style="margin:0 0 8px">Anyone who searches Generation ID <b>${fmtGid(g.id)}</b> on the home page can view this generation – without an account. They can only look, not edit.</p>
+    <p class="note" style="margin:0 0 14px">Parents' and children's generations have their own Private / Public setting.</p>
+    <div class="row"><button class="btn ghost" id="c">Cancel</button><button class="btn" id="ok">Make Public</button></div>`);
+  m.querySelector('#c').onclick = closeModal;
+  m.querySelector('#ok').onclick = () => { closeModal(); setVis(key, 'Public'); };
+}
+function setVis(key, v) {
+  const g = T().gens[key]; if (!g) return;
+  g.vis = v; touch(); if (/^#\/g\//.test(location.hash)) viewGen(key); else viewHome();
+  toast(v === 'Public' ? 'Generation is now Public' : 'Generation is now Private');
+}
+
+function curRef() { const m = location.hash.match(/^#\/g\/(.+)$/); return m ? m[1] : null; }
+
+document.addEventListener('click', e => {
+  if (!S.tree) return;
+  const t = e.target; let el;
+  const cur = findGen(curRef()); if (!cur) return;
+  const key = cur.key;
+  if ((el = t.closest('[data-nav]'))) { if (!S.nav) navPerson(el.dataset.nav, key).catch(ex => toast(ex.message)); return; }
+  if ((el = t.closest('[data-person]'))) return openPerson(key, el.dataset.person, el.dataset.role);
+  if ((el = t.closest('[data-addchild]'))) return openPerson(key, null, el.dataset.addchild === 'm' ? 'son' : 'daughter');
+});
+
+/* Go button
+   Father/Mother -> their parents' generation.   Married Son/Daughter -> their own family generation.
+   1. read the person's LinkedGID   2. find that GID in the list loaded at login
+   3. if the generation is not in memory yet, call that ONE row from the spreadsheet and show it */
+async function navPerson(uid, key) {
+  const p = person(uid), g = T().gens[key]; if (!p || !g) return;
+  if (g.father === uid || g.mother === uid) {
+    let k = upKey(p);
+    if (!k && isGid(p.upGid) && inIndex(p.upGid)) k = await withBusy(() => loadGen(p.upGid));
+    if (k) return go('#/g/' + hashOf(k));
+    if (isGid(p.upGid)) return openPublic(p.upGid, true);   // parents' generation is in another account (e.g. after a transfer): open read-only if Public
+    const who = g.father === uid ? 'Father' : 'Mother';
+    const m = modal(`<h3>Add ${who}’s parents?</h3><p style="margin:0 0 8px">A new generation will be created for the parents of <b>${esc(p.name)}</b>.</p>
+      <div class="row"><button class="btn ghost" id="c">Cancel</button><button class="btn" id="ok">Add</button></div>`);
+    m.querySelector('#c').onclick = closeModal;
+    m.querySelector('#ok').onclick = () => { closeModal(); addParentsGeneration(uid); };
+    return;
+  }
+  let k = ownKey(p);
+  if (!k && isGid(p.downGid) && inIndex(p.downGid)) k = await withBusy(() => loadGen(p.downGid));
+  if (k) return go('#/g/' + hashOf(k));
+  if (isGid(p.downGid)) return openPublic(p.downGid, true);   // own family was transferred to another account: open read-only if Public
+  if (p.married) addChildGeneration(uid);
+}
+
+/* son married -> new generation where son is Father; daughter married -> new generation where she is Mother */
+function addChildGeneration(uid) {
+  const c = person(uid); if (!c) return;
+  let key;
+  if (c.gender === 'm') { const sp = addPerson(makePerson('f')); key = createGen(c.uid, sp.uid); }
+  else { const sp = addPerson(makePerson('m')); key = createGen(sp.uid, c.uid); }
+  touch(); go('#/g/' + key);
+}
+/* a Father/Mother whose own parents are not added yet: create their parents' generation */
+function addParentsGeneration(uid) {
+  const p = person(uid); if (!p) return;
+  const f = addPerson(makePerson('m')), mo = addPerson(makePerson('f'));
+  const key = createGen(f.uid, mo.uid);
+  const g = T().gens[key];
+  (p.gender === 'm' ? g.sons : g.daughters).push(p.uid);
+  p.parentGen = key;
+  touch(); go('#/g/' + key);
+}
+
+/* ---------------------------- GUEST HOME + PUBLIC VIEW (no login) ---------------------------- */
+const PV = {};   // public rows already fetched: gid -> row
+function viewLanding() {
+  setView(`${topbar(brand)}
+  <main class="landing">
+    <div class="logo big">${ICON_TREE}</div>
+    <h1>Find a family generation</h1>
+    <p class="sub">Enter a Generation ID to see a family that has been shared publicly.</p>
+    <form class="findbar" id="pubForm"><input class="input" id="pubId" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Generation ID (8 digits)"><button class="btn" type="submit">Go</button></form>
+    <p class="hint">Private generations do not show up in search.</p>
+    <div class="cta"><p>Want to build your own family tree?</p>
+      <div class="row"><a class="btn ghost" href="#/login">Log in</a><a class="btn" href="#/signup">Create account</a></div>
+</div>
+  </main>`);
+  $('#pubForm').onsubmit = e => { e.preventDefault(); goToId($('#pubId').value); };
+}
+/* fetch ONE public row by GID, then show it. Private and unknown IDs give the same message. */
+async function openPublic(gid, linked) {
+  if (S.nav) return;
+  if (linked) delete PV[gid];                       // reached through a Go button: always check the current Private / Public setting
+  try {
+    await withBusy(async () => { if (!PV[gid]) PV[gid] = (await api('publicGen', {gid})).row; });
+    goPub(gid);
+  } catch (e) { toast(/Network|unexpected/i.test(e.message) ? e.message : linked ? 'Next generation is private. Its owner has not made it public.' : 'No generation found with this ID, or it is private'); }
+}
+function parsePub(row) {
+  const r = normRow(row);
+  const conv = r.conv.split(',').map(x => x.trim()), names = r.names.split(','), imgs = r.images.split(','), mar = r.marriage.split(','), lnk = r.links.split(',');
+  const o = {gid: r.gid, father: null, mother: null, sons: [], daughters: []};
+  conv.forEach((c, j) => {
+    const p = {name: (names[j] || '').trim(), photo: dec(imgs[j]), married: (mar[j] || '').trim().toLowerCase() === 'yes', link: (lnk[j] || '').trim()};
+    if (conv[j] === 'Fa') o.father = p; else if (conv[j] === 'Mo') o.mother = p; else if (conv[j] === 'So') o.sons.push(p); else if (conv[j] === 'Da') o.daughters.push(p);
+  });
+  return o;
+}
+/* read-only card: photo + name, Go button only when that person's linked generation exists */
+function pubCard(p, role, nth) {
+  const left = role === 'father' || role === 'son';
+  const isParent = role === 'father' || role === 'mother';
+  const hasGo = isGid(p.link) && (isParent || p.married);
+  const btn = hasGo ? `<button class="gobtn" data-pub="${esc(p.link)}" aria-label="${isParent ? 'Open parents' : 'Open family'}">${left ? ARROW_L : ARROW_R}</button>` : '<span class="gap"></span>';
+  const uidTxt = `<span class="uid">${ROLE_NAME[role]}</span>`;
+  const photo = `<div class="photo">${p.photo ? `<img src="${esc(p.photo)}" alt="" referrerpolicy="no-referrer">` : ICON_USER}</div>`;
+  return `<div class="card"><div class="chead">${left ? btn + uidTxt : uidTxt + btn}</div><div class="cmain ro">${photo}<div class="pname">${esc(p.name)}</div></div></div>`;
+}
+async function viewPublic(gid) {
+  const top = S.token
+    ? topbar(`<a class="iconbtn" href="#/" aria-label="Home">&#8592;</a><div class="grow"></div><span class="chip">Public view</span>`)
+    : topbar(`${brand}<div class="grow"></div><a class="btn sm ghost" href="#/login">Log in</a>`);
+  if (!isGid(gid)) return setView(`${top}<div class="pubmsg"><h3>Invalid Generation ID</h3><p>A Generation ID has 8 digits.</p></div>`);
+  window.scrollTo(0, 0);
+  if (!PV[gid]) {
+    setView(`${top}<div class="loading"><span class="spin dark" style="width:28px;height:28px"></span></div>`);
+    try { PV[gid] = (await api('publicGen', {gid})).row; }
+    catch (e) {
+      return setView(`${top}<div class="pubmsg"><h3>Generation not available</h3><p>${/Network|unexpected/i.test(e.message) ? esc(e.message) : 'No generation was found with this ID. It may be private and not shared with you, or the ID may be wrong.'}</p><a class="btn ghost" href="#/">Back</a></div>`);
+    }
+  }
+  const g = parsePub(PV[gid]);
+  if (!g.father || !g.mother) return setView(`${top}<div class="pubmsg"><h3>Generation not available</h3><a class="btn ghost" href="#/">Back</a></div>`);
+  setView(`${top}
+  <div class="gtop">
+    <div class="vnote">${PV[gid].by ? 'Shared with you by ' + esc(PV[gid].by) + ' – view only.' : PV[gid].vis === 'Public' ? 'Public generation – view only.' : 'Private generation – view only.'}</div></div>
+  <div class="couple">
+    <div class="colm">${pubCard(g.father, 'father', 0)}${g.sons.length ? `<div class="stack">${g.sons.map((p, i) => pubCard(p, 'son', i + 1)).join('')}</div>` : ''}</div>
+    <div class="colm">${pubCard(g.mother, 'mother', 0)}${g.daughters.length ? `<div class="stack">${g.daughters.map((p, i) => pubCard(p, 'daughter', i + 1)).join('')}</div>` : ''}</div>
+  </div>`);
+  document.querySelectorAll('[data-pub]').forEach(b => b.onclick = () => openPublic(b.dataset.pub, true));
+}
+
+/* ---------------------------- person form ---------------------------- */
+function compress(file, w = 480, h = 480) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); const s = Math.max(w / img.width, h / img.height);
+      const dw = img.width * s, dh = img.height * s;
+      x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, (w - dw) / 2, -(dh - h) * 0.22, dw, dh); // face usually in upper part: keep top, trim bottom
+      URL.revokeObjectURL(url); resolve(c.toDataURL('image/jpeg', 0.78));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
+    img.src = url;
+  });
+}
+
+function openPerson(key, uid, role) {
+  const g = T().gens[key];
+  const isNew = !uid;
+  const isChild = role === 'son' || role === 'daughter';
+  const p = isNew ? makePerson(role === 'son' ? 'm' : 'f') : person(uid);
+  if (!p) return;
+  const title = isNew ? 'Add ' + (role === 'son' ? 'Son' : 'Daughter') : ({father: 'Father', mother: 'Mother', son: 'Son', daughter: 'Daughter'}[role] + ' details');
+  let photoVal = p.photo, married = !!p.married, busy = false;
+  let hideVal = !!p.hide;
+  const canHide = !!S.user;                                // the admin (owner) and admin-mode people can hide / show any photo
+  const sibs = role === 'son' ? g.sons : g.daughters;        // the order of this list = Son #1, #2, #3 ...
+  const total = isChild ? sibs.length + (isNew ? 1 : 0) : 0;
+  let pos = isChild ? (isNew ? total : sibs.indexOf(p.uid) + 1) : 0;
+  const lockMarried = !isNew && isChild && hasOwn(p);
+
+  const m = modal(`<h3>${title}</h3>
+    <div class="pm-photo"><div class="photo" id="pPhoto" style="position:relative"></div><small id="pLbl"></small></div>
+    <div class="err" id="pErr"></div>
+    ${canHide ? `<label class="chk hidechk"><input type="checkbox" id="pHide"><span>Hide this photo from everyone<small>Nobody will see it – not on the cards, not in public or shared views. Untick to show it again.</small></span></label>` : (p.hide ? `<p class="note" style="margin:0 0 14px">This photo is hidden.</p>` : '')}
+    <label class="field"><span>Full name *</span><input class="input" id="pName" maxlength="40" placeholder="Name" value="${esc(p.name)}"></label>
+    ${isChild ? `<div class="field"><span class="lbl">Marital status</span><div class="seg"><button type="button" data-m="0">Unmarried</button><button type="button" data-m="1">&#9829; Married</button></div>
+      <p class="note" id="mNote"></p></div>` : ''}
+    <div class="details">
+      <div><span>Role</span><b class="role-${role} rolewrap" id="pRole">${ROLE_NAME[role]}${isChild ? ' #' + (true ? `<select class="possel role-${role}" id="pSel" aria-label="Change position">${Array.from({length: total}, (_, k) => `<option value="${k + 1}"${k + 1 === pos ? ' selected' : ''}>${k + 1}</option>`).join('')}</select>` : pos) : ''}</b></div>
+      ${g.id ? `<div><span>Generation ID</span><b>${fmtGid(g.id)}</b></div>` : ''}
+      ${!isChild ? '<div><span>Status</span><b style="color:var(--clay)">&#9829; Married</b></div>' : ''}
+    </div>
+    <input type="file" id="pFile" accept="image/*" hidden>
+    <div class="row"><button class="btn ghost" id="c">Cancel</button><button class="btn" id="ok">Save</button></div>
+    ${isChild && !isNew ? '<div class="row"><button class="btn danger" id="del">Delete</button></div>' : ''}`);
+
+  const drawPhoto = () => {
+    const show = !!photoVal && (!hideVal || canHide);      // someone who may not change the setting never sees a hidden photo
+    const ph = m.querySelector('#pPhoto'); ph.classList.toggle('hid', show && hideVal);
+    ph.innerHTML = (show ? `<img src="${esc(photoVal)}" alt="" referrerpolicy="no-referrer">` : ICON_USER) + (show && hideVal ? '<span class="hidtag">Hidden from everyone</span>' : '') + (busy ? '<div class="busyov"><span class="spin dark"></span></div>' : '');
+    m.querySelector('#pLbl').textContent = photoVal ? 'Change photo' : 'Add photo';
+  };
+  const drawMar = () => {
+    if (!isChild) return;
+    m.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', (b.dataset.m === '1') === married));
+    m.querySelector('#mNote').textContent = lockMarried ? (ownKey(p) ? 'This person has a family generation, so it cannot be changed to Unmarried. Delete that generation first.' : 'This person has a linked family generation, so it cannot be changed to Unmarried.')
+      : married ? 'A + button will appear on this card to add their family generation.' : 'The + button appears after marriage.';
+  };
+  drawPhoto(); drawMar();
+  const hc = m.querySelector('#pHide'); if (hc) { hc.checked = hideVal; hc.onchange = () => { hideVal = hc.checked; drawPhoto(); }; }
+  const sel = m.querySelector('#pSel'); if (sel) sel.onchange = () => { pos = +sel.value; };
+  if (isChild) m.querySelectorAll('.seg button').forEach(b => b.onclick = () => { if (lockMarried && b.dataset.m === '0') return; married = b.dataset.m === '1'; drawMar(); });
+  const pick = () => m.querySelector('#pFile').click();
+  m.querySelector('#pPhoto').onclick = pick; m.querySelector('#pLbl').onclick = pick;
+  m.querySelector('#pFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    busy = true; drawPhoto();
+    try { photoVal = (await api('uploadPhoto', {dataUrl: await compress(f)})).url; }
+    catch (ex) { toast(ex.message); }
+    busy = false; drawPhoto();
+  };
+  m.querySelector('#c').onclick = closeModal;
+  const save = () => {
+    const name = m.querySelector('#pName').value.trim();
+    if (busy) return toast('Photo is still uploading…');
+    if (!name) { const er = m.querySelector('#pErr'); er.textContent = 'Please enter the name.'; er.classList.add('show'); m.querySelector('#pName').focus(); return; }
+    p.name = name.replace(/\s*,\s*/g, ' '); p.photo = photoVal;
+    if (canHide) p.hide = hideVal;
+    if (isChild) p.married = married;
+    if (isNew) { addPerson(p); p.parentGen = key; }
+    if (isChild) {                                              // put him / her at the chosen position
+      const list = role === 'son' ? g.sons : g.daughters;
+      const at = list.indexOf(p.uid); if (at >= 0) list.splice(at, 1);
+      list.splice(Math.min(pos, list.length + 1) - 1, 0, p.uid);
+    }
+    ensureIds(); touch(); closeModal();
+    if (g.id && curRef() !== g.id) history.replaceState(null, '', '#/g/' + g.id);   // address bar now shows the Generation ID
+    viewGen(key);
+  };
+  m.querySelector('#ok').onclick = save;
+  m.querySelector('#pName').onkeydown = e => { if (e.key === 'Enter') save(); };
+  const del = m.querySelector('#del');
+  if (del) del.onclick = async () => {
+    if (g.mine === false && hasOwn(p)) return toast('This person has a family generation. Only the admin (owner) of this generation can delete them.');
+    const extra = ownKey(p) ? ' Their family generation and everyone below will also be deleted.' : '';
+    if (!confirm('Delete ' + (p.name || 'this person') + '?' + extra)) return;
+    try { await withBusy(() => ensureDown(p)); } catch (ex) { return toast(ex.message); }   // load their family below so it is deleted too
+    deleteChild(key, p.uid); touch(); closeModal(); viewGen(key);
+  };
+  if (isNew || !p.name) m.querySelector('#pName').focus();
+}
+
+/* ---------------------------- boot ---------------------------- */
+route();
+</script>
+</body>
+</html>
